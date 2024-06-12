@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 import { HomePage } from "./layouts/home";
 
 const queryClient = new QueryClient();
