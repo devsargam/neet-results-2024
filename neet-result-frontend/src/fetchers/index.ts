@@ -16,7 +16,7 @@ export async function fetchPaginatedResults({
   next: number | null;
 }> {
   return (
-    (await axios.get(`${BASE_URL}/results?skip=${pageParam}&limit=4`)).data ??
+    (await axios.get(`${BASE_URL}/results?skip=${pageParam}&limit=20`)).data ??
     []
   );
 }
