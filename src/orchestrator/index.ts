@@ -82,3 +82,29 @@ app.get("/total", async (req, res) => {
   });
   res.json({ len: total.length, total });
 });
+
+app.get("/results", async (req, res) => {
+  try {
+    const skip = req.query.skip ? parseInt(req.query.skip as string) : 0;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+
+    if (isNaN(skip) || isNaN(limit) || skip < 0 || limit <= 0) {
+      return res.status(400).json({ error: "Invalid query parameters" });
+    }
+
+    const results = await db.result.findMany({
+      skip,
+      take: limit,
+      where: {
+        marks: {
+          not: null,
+        },
+      },
+    });
+
+    res.json({ results, next: skip + limit });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
