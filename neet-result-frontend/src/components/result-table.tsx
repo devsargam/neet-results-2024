@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Table,
   TableBody,
@@ -6,43 +7,69 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { fetchAllResults } from "@/fetchers";
-import { useQuery } from "@tanstack/react-query";
+import { fetchPaginatedResults } from "@/fetchers";
+import { Button } from "./ui/button";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { Fragment } from "react/jsx-runtime";
 
 export function ResultTable() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["results"],
-    queryFn: fetchAllResults,
-  });
+  const { data, isLoading, isError, fetchNextPage, hasNextPage } =
+    useInfiniteQuery({
+      queryKey: ["results"],
+      queryFn: fetchPaginatedResults,
+      getNextPageParam: (lastPage, _) => lastPage.next,
+      initialPageParam: 0,
+    });
 
   if (isLoading) return <div>Loading...</div>;
 
   if (isError || !data) return <div>Error fetching data</div>;
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[100px]">Id</TableHead>
-          <TableHead>Application Number</TableHead>
-          <TableHead>Full Name</TableHead>
-          <TableHead>AIR</TableHead>
-          <TableHead>Marks</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {data.map(
-          ({ id, allIndiaRank, applicationNumber, candidateName, marks }) => (
-            <TableRow key={id}>
-              <TableCell className="font-medium">{id}</TableCell>
-              <TableCell>{applicationNumber}</TableCell>
-              <TableCell>{candidateName}</TableCell>
-              <TableCell>{allIndiaRank}</TableCell>
-              <TableCell>{marks}</TableCell>
-            </TableRow>
-          )
-        )}
-      </TableBody>
-    </Table>
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">Id</TableHead>
+            <TableHead>Application Number</TableHead>
+            <TableHead>Full Name</TableHead>
+            <TableHead>AIR</TableHead>
+            <TableHead>Marks</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data.pages.map(({ results }, i) => (
+            <Fragment key={i}>
+              {results.map(
+                ({
+                  id,
+                  applicationNumber,
+                  candidateName,
+                  allIndiaRank,
+                  marks,
+                }) => (
+                  <TableRow key={id}>
+                    <TableCell>{id}</TableCell>
+                    <TableCell>{applicationNumber}</TableCell>
+                    <TableCell>{candidateName}</TableCell>
+                    <TableCell>{allIndiaRank}</TableCell>
+                    <TableCell>{marks}</TableCell>
+                  </TableRow>
+                )
+              )}
+            </Fragment>
+          ))}
+        </TableBody>
+      </Table>
+      <Button
+        variant="default"
+        onClick={() => {
+          fetchNextPage();
+        }}
+        disabled={!hasNextPage}
+      >
+        Load more...
+      </Button>
+    </>
   );
 }
