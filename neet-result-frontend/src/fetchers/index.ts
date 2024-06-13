@@ -9,14 +9,21 @@ export async function fetchAllResults(): Promise<IResult[]> {
 
 export async function fetchPaginatedResults({
   pageParam = 0,
+  queryKey,
 }: {
-  pageParam?: number;
+  pageParam: number;
+  queryKey: string[];
 }): Promise<{
   results: IResult[];
   next: number | null;
 }> {
+  const [, searchTerm] = queryKey;
+
   return (
-    (await axios.get(`${BASE_URL}/results?skip=${pageParam}&limit=20`)).data ??
-    []
+    (
+      await axios.get(
+        `${BASE_URL}/results?skip=${pageParam}&limit=20&search=${searchTerm}`
+      )
+    ).data ?? []
   );
 }

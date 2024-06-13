@@ -87,9 +87,24 @@ app.get("/results", async (req, res) => {
   try {
     const skip = req.query.skip ? parseInt(req.query.skip as string) : 0;
     const limit = req.query.limit ? parseInt(req.query.limit as string) : 10;
+    const search = req.query.search ? req.query.search as string : "";
 
     if (isNaN(skip) || isNaN(limit) || skip < 0 || limit <= 0) {
       return res.status(400).json({ error: "Invalid query parameters" });
+    }
+
+    if (!search.length) {
+      const results = await db.result.findMany({
+        skip,
+        take: limit,
+        where: {
+          marks: {
+            not: null,
+          },
+        },
+      });
+
+      return res.json({ results, next: skip + limit });
     }
 
     const results = await db.result.findMany({
@@ -99,9 +114,22 @@ app.get("/results", async (req, res) => {
         marks: {
           not: null,
         },
+        OR: [
+          {
+            applicationNumber: {
+              contains: search,
+              mode: 'insensitive'
+            },
+          },
+          {
+            candidateName: {
+              contains: search,
+              mode: 'insensitive'
+            },
+          },
+        ],
       },
     });
-
     res.json({ results, next: skip + limit });
   } catch (error) {
     console.error(error);

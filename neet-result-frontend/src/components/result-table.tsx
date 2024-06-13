@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Table,
   TableBody,
@@ -7,20 +6,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { fetchPaginatedResults } from "@/fetchers";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { Fragment } from "react/jsx-runtime";
 import { useInView } from "react-intersection-observer";
 import { useEffect } from "react";
+import { useInfiniteSearch } from "@/hooks/use-infinite-search";
 
 export function ResultTable() {
-  const { data, isLoading, isError, fetchNextPage, hasNextPage } =
-    useInfiniteQuery({
-      queryKey: ["results"],
-      queryFn: fetchPaginatedResults,
-      getNextPageParam: (lastPage, _) => lastPage.next,
-      initialPageParam: 0,
-    });
+  const { data, isLoading, isError, fetchNextPage } = useInfiniteSearch();
 
   const { ref, inView } = useInView({
     threshold: 0,
