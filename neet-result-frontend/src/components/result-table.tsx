@@ -40,7 +40,7 @@ export function ResultTable() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Id</TableHead>
+            <TableHead>Id</TableHead>
             <TableHead>Application Number</TableHead>
             <TableHead>Full Name</TableHead>
             <TableHead>AIR</TableHead>
@@ -71,7 +71,7 @@ export function ResultTable() {
           ))}
         </TableBody>
       </Table>
-      <div ref={ref} >End of list</div>
+      <div ref={ref}>End of list</div>
     </>
   );
 }
